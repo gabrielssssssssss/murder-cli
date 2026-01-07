@@ -1,0 +1,39 @@
+import yaml
+
+class Prettier:
+    def __init__(self):
+        pass
+    
+    def json_tidy(self, data:dict, order:list) -> dict:
+        json = {}
+        for ord in order:
+            json[ord] = data[ord]
+        return json
+
+    def json_to_csv(self, data:dict) -> str:
+        elementList = []
+        for _, val in data.items():
+            elementList.append(val)
+        return ",".join(elementList)
+
+    def yaml_prettier(self, data:dict, time:str) -> str:
+        index = data["index"]
+
+        path = f"../templates/{index}.yaml"
+        with open(path, encoding="utf-8") as f:
+            content = yaml.safe_load(f)
+
+        fields = list(content["fields"])
+        jsonTidy = self.json_tidy(data=data, order=fields)
+        csvFormat = self.json_to_csv(data=jsonTidy)
+
+        message = str(content["message"])
+        for element in fields:
+            frmt = "{" + element + "}"
+            message = message.replace(frmt, jsonTidy[element])
+
+        message = message.replace("{csv_format}", csvFormat)
+        message = message.replace("{time}", time)
+        
+        return message
+
