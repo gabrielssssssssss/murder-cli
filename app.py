@@ -10,14 +10,13 @@ Import this module and initialize the Telegram client to start
 listening for messages from authorized users.
 """
 
+import os
 import logging
-
-from telegram import (
-    Update    
-)
-from telegram.ext import (
-    Application    
-)
+import asyncio
+from telebot import types
+from telebot.async_telebot import AsyncTeleBot
+from internal.handlers import BotHandler
+from dotenv import load_dotenv
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -25,13 +24,25 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
-def main() -> None:
-    """Run telegram bot & Init all application module"""
+load_dotenv()
 
-    application = Application.builder().token("TOKEN").build()
-    
-    # Run the bot until the user presses CTRL-C
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+class Application(BotHandler):
+    """
+    Run telegram bot & Init all application module
+    """
+    def __init__(self) -> None:
+        self.application = None
+
+    def main(self) -> None:
+        self.application = AsyncTeleBot(os.getenv("TELEGRAM_TOKEN"))
+
+        @self.application.message_handler(func=lambda message:True)
+        async def on_message(message: types.Message):
+            logger.info(msg=f"New message from {message.chat.id}")
+            await BotHandler.prompt(self, application=self.application, message=message)
+
+        asyncio.run(self.application.infinity_polling())
 
 if __name__ == "__main__":
-    main()
+    app = Application()
+    app.main()
