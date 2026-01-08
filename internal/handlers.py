@@ -10,7 +10,6 @@ class BotHandler:
 
     async def prompt(self, bot: AsyncTeleBot, message: types.Message):
         message_splitter = message.text.split(" ")
-
         parsed_elements = self.utils.parse_elements(message_splitter)
         parsed_filter = self.utils.strict_query_filter(parsed_elements)
         values_query = dict(parsed_elements.get("plain", ""))

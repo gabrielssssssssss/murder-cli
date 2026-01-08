@@ -14,29 +14,30 @@ class Prettier:
         return json
 
     def json_to_csv(self, data:dict) -> str:
-        elementList = []
+        element_list = []
         for val in data.values():
             if val == None: 
-                elementList.append(str("Non renseigné"))
-            else: elementList.append(str(val))
-        return ",".join(elementList)
+                element_list.append(str("Non renseigné"))
+            else: element_list.append(str(val))
+        return ",".join(element_list)
+    
+    def message_prettier(self, content:dict, fields:list[any], json_tidy:dict, csv_format:str, time:str) -> str:
+        message = str(content["message"])
+        for element in fields:
+            frmt = "{" + element + "}"
+            message = message.replace(frmt, str(json_tidy[element]))
+        message = message.replace("{csv_format}", str(csv_format))
+        return message.replace("{time}", str(time))
 
     def yaml_prettier(self, data:dict, time:str) -> str:
         index = data["index"]
         path = f"./templates/{index}.yaml"
+
         with open(path, encoding="utf-8") as f:
             content = yaml.safe_load(f)
-
         fields = list(content["fields"])
-        jsonTidy = self.json_tidy(data=data, order=fields)
-        csvFormat = self.json_to_csv(data=jsonTidy)
 
-        message = str(content["message"])
-        for element in fields:
-            frmt = "{" + element + "}"
-            message = message.replace(frmt, str(jsonTidy[element]))
-
-        message = message.replace("{csv_format}", str(csvFormat))
-        message = message.replace("{time}", str(time))
-        return message
+        json_tidy = self.json_tidy(data=data, order=fields)
+        csv_format = self.json_to_csv(data=json_tidy)
+        return self.message_prettier(content=content, fields=fields, json_tidy=json_tidy, csv_format=csv_format, time=time)
 
