@@ -44,7 +44,7 @@ class Utils:
                     payload_filter_list.append(f" {values.get("operator")}")
         return " ".join(payload_filter_list)
     
-    def get_strict_value(self, elements:list) -> list:
+    def get_strict_values(self, elements:list) -> list:
         strict_elements = []
         for element in elements:
             if str(element).startswith("!"):
@@ -52,9 +52,8 @@ class Utils:
                 strict_elements.append(parse_element)
         return strict_elements
 
-    def check_strict_value(self, elements:list, result:str) -> bool:
-        strict_elements = self.get_strict_value(elements=elements)
+    def check_strict_values(self, strict_elements:list, result:str) -> bool:
         for strict_element in strict_elements:
-            if strict_element in result:
-                return True
+            strict_regex = re.compile(r"{}".format(strict_element), re.IGNORECASE)
+            return bool(re.search(strict_regex, result))
         return False

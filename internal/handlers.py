@@ -21,8 +21,11 @@ class BotHandler:
         )
 
         for result in results:
-            await bot.send_message(
-                message.chat.id,
-                str(result),
-                parse_mode="HTML"
-            )
+            sritct_values = self.utils.get_strict_values(elements=message_splitter)
+            print(self.utils.check_strict_values(strict_elements=sritct_values, result=result))
+            if self.utils.check_strict_values(strict_elements=sritct_values, result=result) or len(sritct_values) == 0:
+                await bot.send_message(
+                    message.chat.id,
+                    str(result),
+                    parse_mode="HTML"
+                )
