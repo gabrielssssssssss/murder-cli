@@ -33,7 +33,7 @@ class BackendClient():
             hits = data["data"]
             message_list = []
             for hit in hits:
-                message = self.prettier.yaml_prettier(data=hit, time=elapsed_time)
+                message = self.prettier.yaml_prettier(data=hit, total_results=len(hits), time=elapsed_time)
                 message_list.append(message)
             return message_list
         return ""

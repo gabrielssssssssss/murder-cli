@@ -14,6 +14,7 @@ logging.basicConfig(
     level=logging.INFO
 )
 logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger('TeleBot').setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 
 load_dotenv()
@@ -29,8 +30,19 @@ class Application:
     def main(self) -> None:
         @self.bot.message_handler(func=lambda message: True)
         async def on_message(message: types.Message):
-            logger.info(f"New message from {message.chat.id}")
             await self.handler.prompt(bot=self.bot, message=message)
+
+        @self.bot.callback_query_handler(func=lambda call: True)
+        async def on_callback(call: types.CallbackQuery):
+            if call.data.startswith("pagination_"):
+                await self.handler.update_message(bot=self.bot, call=call)
+
+        @self.bot.callback_query_handler(func=lambda call: True)
+        async def callback_handler(call):
+            if call.data == 'button_click':
+                self.bot.answer_callback_query(call.id, text='Button clicked!')
+                self.bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Button clicked!')
+
         asyncio.run(self.bot.infinity_polling())
 
 if __name__ == "__main__":
