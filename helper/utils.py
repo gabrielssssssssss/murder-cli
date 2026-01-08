@@ -32,7 +32,10 @@ class Utils:
             elif re.search(self.birthdate, parse_element):
                 dict_elements["birthdate"] = {"value": parse_element, "operator": "AND"}
             else:
-                dict_elements["plain"] = {"value": parse_element, "operator": "AND"}
+                if dict_elements.get("plain", "") == "":
+                    dict_elements["plain"] = {"value": parse_element, "operator": "AND"}
+                else:
+                    dict_elements["plain"]["value"] = " ".join([dict_elements["plain"]["value"], parse_element])
         return dict_elements
                 
     def strict_query_filter(self, dict_elements:dict) -> str:
@@ -55,5 +58,6 @@ class Utils:
     def check_strict_values(self, strict_elements:list, result:str) -> bool:
         for strict_element in strict_elements:
             strict_regex = re.compile(r"{}".format(strict_element), re.IGNORECASE)
-            return bool(re.search(strict_regex, result))
-        return False
+            if bool(re.search(strict_regex, result)) != True:
+                return False
+        return True
