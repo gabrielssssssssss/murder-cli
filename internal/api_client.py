@@ -22,11 +22,11 @@ class BackendClient():
             "Filter": filter,
             "Limit": limit,
         }
-
+        
         start_time = round(time.time() * 1000)
         response = httpx.post(url=url, headers=self.headers, json=payload)
+        print(response.text)
         end_time = round(time.time() * 1000)
-
         elapsed_time = f"{(end_time - start_time):.2f}ms"
 
         if response.status_code == 200:

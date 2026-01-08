@@ -23,16 +23,14 @@ class Application:
         prettier = Prettier()
         utils = Utils()
         self.api_client = BackendClient(prettier=prettier, utils=utils)
-        self.handler = BotHandler(api_client=self.api_client)
+        self.handler = BotHandler(api_client=self.api_client, utils=utils)
         self.bot = AsyncTeleBot(os.getenv("TELEGRAM_TOKEN"))
 
     def main(self) -> None:
-
         @self.bot.message_handler(func=lambda message: True)
         async def on_message(message: types.Message):
             logger.info(f"New message from {message.chat.id}")
             await self.handler.prompt(bot=self.bot, message=message)
-
         asyncio.run(self.bot.infinity_polling())
 
 if __name__ == "__main__":

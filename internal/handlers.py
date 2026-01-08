@@ -1,15 +1,23 @@
 from internal.api_client import BackendClient
+from helper.utils import Utils
 from telebot import types
 from telebot.async_telebot import AsyncTeleBot
 
 class BotHandler:
-    def __init__(self, api_client: BackendClient) -> None:
+    def __init__(self, api_client: BackendClient, utils: Utils) -> None:
         self.api_client = api_client
+        self.utils = utils
 
     async def prompt(self, bot: AsyncTeleBot, message: types.Message):
+        message_splitter = message.text.split(" ")
+
+        parsed_elements = self.utils.parse_elements(message_splitter)
+        parsed_filter = self.utils.strict_query_filter(parsed_elements)
+        values_query = dict(parsed_elements.get("plain", ""))
+
         results = self.api_client.search(
-            query="22000",
-            filter="lastname='Doumbia'",
+            query=values_query.get("value"),
+            filter=parsed_filter,
             limit=3
         )
 
