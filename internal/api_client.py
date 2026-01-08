@@ -1,4 +1,5 @@
 import os
+import time
 import httpx
 from helper.prettier import Prettier
 from helper.utils import Utils
@@ -21,14 +22,19 @@ class BackendClient():
             "Filter": filter,
             "Limit": limit,
         }
+
+        start_time = round(time.time() * 1000)
         response = httpx.post(url=url, headers=self.headers, json=payload)
+        end_time = round(time.time() * 1000)
+
+        elapsed_time = f"{(end_time - start_time):.2f}ms"
 
         if response.status_code == 200:
             data = response.json()
             hits = data["data"]
             message_list = []
             for hit in hits:
-                message = self.prettier.yaml_prettier(data=hit, time="326ms")
+                message = self.prettier.yaml_prettier(data=hit, time=elapsed_time)
                 message_list.append(message)
             return message_list
         return ""

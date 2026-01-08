@@ -7,13 +7,18 @@ class Prettier:
     def json_tidy(self, data:dict, order:list) -> dict:
         json = {}
         for ord in order:
-            json[ord] = data[ord]
+            value = data.get(ord, "Non renseigné")
+            if value == None: 
+                json[ord] = "Non renseigné"
+            else: json[ord] = value
         return json
 
     def json_to_csv(self, data:dict) -> str:
         elementList = []
-        for _, val in data.items():
-            elementList.append(str(val))
+        for val in data.values():
+            if val == None: 
+                elementList.append(str("Non renseigné"))
+            else: elementList.append(str(val))
         return ",".join(elementList)
 
     def yaml_prettier(self, data:dict, time:str) -> str:
@@ -33,6 +38,5 @@ class Prettier:
 
         message = message.replace("{csv_format}", str(csvFormat))
         message = message.replace("{time}", str(time))
-        
         return message
 

@@ -8,9 +8,9 @@ class BotHandler:
 
     async def prompt(self, bot: AsyncTeleBot, message: types.Message):
         results = self.api_client.search(
-            query="",
-            filter="lastname='alain'",
-            limit=10
+            query="22000",
+            filter="lastname='Doumbia'",
+            limit=3
         )
 
         for result in results:
