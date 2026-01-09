@@ -20,7 +20,7 @@ class BotHandler:
         values_query = dict(parsed_elements.get("plain", ""))
 
         results = self.api_client.search(
-            query=values_query.get("value"),
+            query=message.text,
             filter=parsed_filter,
             limit=3
         )
@@ -59,12 +59,11 @@ class BotHandler:
 
     async def update_message(self, bot: AsyncTeleBot, call: types.CallbackQuery) -> None:
         data_split = call.data.split("_")
-        chat_id = call.from_user.id
-        message_id = call.message.id
-
         uuid = data_split[2]
         current_page = int(data_split[3])
-        markup = types.InlineKeyboardMarkup(row_width=2)
+
+        text = ""
+        page_event = ""
         lenght = len(self.result_memory_save[uuid])
 
         if data_split[1] == "start":
@@ -75,22 +74,8 @@ class BotHandler:
             new_page = self.result_memory_save[uuid][0]
             text = str(new_page).replace("{page_current}", "1")
             text = text.replace("{total_results}", str(lenght))
+            page_event = "0"
 
-            markup.add(
-                types.InlineKeyboardButton(text="◀️", callback_data=f"pagination_previous_{uuid}_0"), 
-                types.InlineKeyboardButton(text="▶️", callback_data=f"pagination_next_{uuid}_0"), 
-                types.InlineKeyboardButton(text="⏪", callback_data=f"pagination_start_{uuid}_0"), 
-                types.InlineKeyboardButton(text="⏩", callback_data=f"pagination_last_{uuid}_0")
-            )
-
-            await bot.edit_message_text(
-                chat_id=chat_id,
-                message_id=message_id,
-                text=text,
-                parse_mode="HTML",
-                reply_markup=markup
-            )
-        
         elif data_split[1] == "previous":
             if (current_page) == 0:
                 await bot.answer_callback_query(call.id, text="🚫 Vous ne pouvez pas effectuer cette action.")
@@ -99,22 +84,8 @@ class BotHandler:
             new_page = self.result_memory_save[uuid][current_page-1]
             text = str(new_page).replace("{page_current}", str(current_page))
             text = text.replace("{total_results}", str(lenght))
+            page_event = str(current_page-1)
 
-            markup.add(
-                types.InlineKeyboardButton(text="◀️", callback_data=f"pagination_previous_{uuid}_{current_page-1}"), 
-                types.InlineKeyboardButton(text="▶️", callback_data=f"pagination_next_{uuid}_{current_page-1}"), 
-                types.InlineKeyboardButton(text="⏪", callback_data=f"pagination_start_{uuid}_{current_page-1}"), 
-                types.InlineKeyboardButton(text="⏩", callback_data=f"pagination_last_{uuid}_{current_page-1}")
-            )
-
-            await bot.edit_message_text(
-                chat_id=chat_id,
-                message_id=message_id,
-                text=text,
-                parse_mode="HTML",
-                reply_markup=markup
-            )
-        
         elif data_split[1] == "next":
             if lenght <= current_page+1:
                 await bot.answer_callback_query(call.id, text="🚫 Vous ne pouvez pas effectuer cette action.")
@@ -123,21 +94,7 @@ class BotHandler:
             new_page = self.result_memory_save[uuid][current_page+1]
             text = str(new_page).replace("{page_current}", str(current_page+2))
             text = text.replace("{total_results}", str(lenght))
-
-            markup.add(
-                types.InlineKeyboardButton(text="◀️", callback_data=f"pagination_previous_{uuid}_{current_page+1}"), 
-                types.InlineKeyboardButton(text="▶️", callback_data=f"pagination_next_{uuid}_{current_page+1}"),
-                types.InlineKeyboardButton(text="⏪", callback_data=f"pagination_start_{uuid}_{current_page+1}"), 
-                types.InlineKeyboardButton(text="⏩", callback_data=f"pagination_last_{uuid}_{current_page+1}")
-            )
-
-            await bot.edit_message_text(
-                chat_id=chat_id,
-                message_id=message_id,
-                text=text,
-                parse_mode="HTML",
-                reply_markup=markup
-            )
+            page_event = str(current_page+1)
         
         elif data_split[1] == "last":
             if lenght <= current_page+1:
@@ -147,18 +104,19 @@ class BotHandler:
             new_page = self.result_memory_save[uuid][lenght-1]
             text = str(new_page).replace("{page_current}", str(lenght))
             text = text.replace("{total_results}", str(lenght))
+            page_event = str(lenght-1)
 
-            markup.add(
-                types.InlineKeyboardButton(text="◀️", callback_data=f"pagination_previous_{uuid}_{lenght-1}"), 
-                types.InlineKeyboardButton(text="▶️", callback_data=f"pagination_next_{uuid}_{lenght-1}"),
-                types.InlineKeyboardButton(text="⏪", callback_data=f"pagination_start_{uuid}_{lenght-1}"), 
-                types.InlineKeyboardButton(text="⏩", callback_data=f"pagination_last_{uuid}_{lenght-1}")
-            )
+        markup = types.InlineKeyboardMarkup(row_width=2).add(
+            types.InlineKeyboardButton(text="◀️", callback_data=f"pagination_previous_{uuid}_{page_event}"), 
+            types.InlineKeyboardButton(text="▶️", callback_data=f"pagination_next_{uuid}_{page_event}"), 
+            types.InlineKeyboardButton(text="⏪", callback_data=f"pagination_start_{uuid}_{page_event}"), 
+            types.InlineKeyboardButton(text="⏩", callback_data=f"pagination_last_{uuid}_{page_event}")
+        )
 
-            await bot.edit_message_text(
-                chat_id=chat_id,
-                message_id=message_id,
-                text=text,
-                parse_mode="HTML",
-                reply_markup=markup
-            )
+        await bot.edit_message_text(
+            chat_id=call.from_user.id,
+            message_id=call.message.id,
+            text=text,
+            parse_mode="HTML",
+            reply_markup=markup
+        )

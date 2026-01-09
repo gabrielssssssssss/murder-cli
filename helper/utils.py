@@ -21,14 +21,14 @@ class Utils:
         for value in elements:
             parse_element = str(value).replace("!", "")
             if re.search(self.regex_email, parse_element):
-                dict_elements["email"] = {"value": parse_element, "operator": "OR"}
-                dict_elements["email2"] = {"value": parse_element, "operator": "AND"}
+                dict_elements["email"] = {"value": parse_element, "operator": "ABD"}
+                # dict_elements["email2"] = {"value": parse_element, "operator": "AND"}
             elif re.search(self.regex_zip_code, parse_element):
                 dict_elements["zipcode"] = {"value": parse_element, "operator": "AND"}
             elif re.search(self.regex_phone_number, parse_element):
-                dict_elements["mobile"] = {"value": parse_element, "operator": "OR"}
-                dict_elements["mobile2"] = {"value": parse_element, "operator": "OR"}
-                dict_elements["mobile3"] = {"value": parse_element, "operator": "AND"}
+                dict_elements["mobile"] = {"value": parse_element, "operator": "AND"}
+                # dict_elements["mobile2"] = {"value": parse_element, "operator": "OR"}
+                # dict_elements["mobile3"] = {"value": parse_element, "operator": "AND"}
             elif re.search(self.regex_birthdate, parse_element):
                 dict_elements["birthdate"] = {"value": parse_element, "operator": "AND"}
             else:

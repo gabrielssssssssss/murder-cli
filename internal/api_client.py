@@ -22,7 +22,7 @@ class BackendClient():
             "Filter": filter,
             "Limit": limit,
         }
-        
+
         start_time = round(time.time() * 1000)
         response = httpx.post(url=url, headers=self.headers, json=payload)
         end_time = round(time.time() * 1000)
