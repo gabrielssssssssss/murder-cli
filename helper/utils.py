@@ -63,7 +63,7 @@ class Utils:
 
     def check_strict_values(self, strict_elements:list, result:str) -> bool:
         for strict_element in strict_elements:
-            strict_regex = re.compile(r"{}".format(strict_element), re.IGNORECASE)
+            strict_regex = re.compile(re.escape(r"{}".format(strict_element)), re.IGNORECASE)
             if bool(re.search(strict_regex, result)) != True:
                 return False
         return True

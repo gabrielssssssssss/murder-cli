@@ -42,7 +42,6 @@ class BotHandler:
     
         for result in results:
             strict_values = self.utils.get_strict_values(elements=message_splitter)
-            print("Strict values debug: ", strict_values)
             if self.utils.check_strict_values(strict_elements=strict_values, result=result) or len(strict_values) == 0:
                 lenght = len(self.result_memory_save[str(results_uuid)])
                 self.result_memory_save[str(results_uuid)][lenght] = result
