@@ -24,6 +24,13 @@ class BotHandler:
             filter=parsed_filter,
             limit=3
         )
+        
+        if results == "":
+            await bot.send_message(
+                message.chat.id,
+                f"<b>⚡️ Votre recherche <code>{message.text}</code> ne correspond à aucun résultats présent dans nos bases.</b>",
+                parse_mode="HTML"
+            )
 
         markup = types.InlineKeyboardMarkup(row_width=2)
         markup.add(
