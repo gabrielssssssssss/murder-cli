@@ -34,14 +34,16 @@ class BotHandler:
         )
     
         for result in results:
-            sritct_values = self.utils.get_strict_values(elements=message_splitter)
-            if self.utils.check_strict_values(strict_elements=sritct_values, result=result) or len(sritct_values) == 0:
+            strict_values = self.utils.get_strict_values(elements=message_splitter)
+            print("Strict values debug: ", strict_values)
+            if self.utils.check_strict_values(strict_elements=strict_values, result=result) or len(strict_values) == 0:
                 lenght = len(self.result_memory_save[str(results_uuid)])
                 self.result_memory_save[str(results_uuid)][lenght] = result
 
         new_page = str(self.result_memory_save[str(results_uuid)][0])
         text = str(new_page).replace("{page_current}", "1")
-        
+        text = text.replace("{total_results}", str(len(self.result_memory_save[str(results_uuid)])))
+
         await bot.send_message(
             message.chat.id,
             text,
@@ -66,6 +68,7 @@ class BotHandler:
             
             new_page = self.result_memory_save[uuid][0]
             text = str(new_page).replace("{page_current}", "1")
+            text = text.replace("{total_results}", str(lenght))
 
             markup.add(
                 types.InlineKeyboardButton(text="◀️", callback_data=f"pagination_previous_{uuid}_0"), 
@@ -88,7 +91,8 @@ class BotHandler:
                 return
             
             new_page = self.result_memory_save[uuid][current_page-1]
-            text = str(new_page).replace("{page_current}", str(current_page-1))
+            text = str(new_page).replace("{page_current}", str(current_page))
+            text = text.replace("{total_results}", str(lenght))
 
             markup.add(
                 types.InlineKeyboardButton(text="◀️", callback_data=f"pagination_previous_{uuid}_{current_page-1}"), 
@@ -112,6 +116,7 @@ class BotHandler:
             
             new_page = self.result_memory_save[uuid][current_page+1]
             text = str(new_page).replace("{page_current}", str(current_page+2))
+            text = text.replace("{total_results}", str(lenght))
 
             markup.add(
                 types.InlineKeyboardButton(text="◀️", callback_data=f"pagination_previous_{uuid}_{current_page+1}"), 
@@ -135,6 +140,7 @@ class BotHandler:
 
             new_page = self.result_memory_save[uuid][lenght-1]
             text = str(new_page).replace("{page_current}", str(lenght))
+            text = text.replace("{total_results}", str(lenght))
 
             markup.add(
                 types.InlineKeyboardButton(text="◀️", callback_data=f"pagination_previous_{uuid}_{lenght-1}"), 
