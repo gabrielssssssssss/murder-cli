@@ -22,21 +22,27 @@ class Prettier:
         return ",".join(element_list)
     
     def message_prettier(self, content:dict, fields:list[any], json_tidy:dict, csv_format:str, time:str, total_results:str) -> str:
-        message = str(content["message"])
-        for element in fields:
-            frmt = "{" + element + "}"
-            message = message.replace(frmt, str(json_tidy[element]))
-        message = message.replace("{csv_format}", str(csv_format))
-        message = message.replace("{total_results}", str(total_results))
-        return message.replace("{time}", str(time))
+        message = content["message"]
+        values = {
+            "csv_format": csv_format,
+            "time": time,
+            "total_results": total_results,
+        }
+        for field in fields:
+            values[field] = json_tidy[field]
+        for key, value in values.items():
+            message = message.replace(f"{{{key}}}", str(value))
+        return message
 
     def yaml_prettier(self, data:dict, total_results:str, time:str) -> str:
         path = f"./templates/{data["index"]}.yaml"
+
         with open(path, encoding="utf-8") as f:
             content = yaml.safe_load(f)
-        fields = list(content["fields"])
 
+        fields = list(content["fields"])
         json_tidy = self.json_tidy(data=data, order=fields)
         csv_format = self.json_to_csv(data=json_tidy)
+
         return self.message_prettier(content=content, fields=fields, json_tidy=json_tidy, csv_format=csv_format, time=time, total_results=total_results)
 

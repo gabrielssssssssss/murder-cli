@@ -30,7 +30,7 @@ class Application:
     def main(self) -> None:
         @self.bot.message_handler(func=lambda message: True)
         async def on_message(message: types.Message):
-            await self.handler.prompt(bot=self.bot, message=message)
+            await self.handler.search_query(bot=self.bot, message=message)
 
         @self.bot.callback_query_handler(func=lambda call: True)
         async def on_callback(call: types.CallbackQuery):
