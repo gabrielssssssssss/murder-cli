@@ -37,12 +37,6 @@ class Application:
             if call.data.startswith("pagination_"):
                 await self.handler.update_message(bot=self.bot, call=call)
 
-        @self.bot.callback_query_handler(func=lambda call: True)
-        async def callback_handler(call):
-            if call.data == 'button_click':
-                self.bot.answer_callback_query(call.id, text='Button clicked!')
-                self.bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Button clicked!')
-
         asyncio.run(self.bot.infinity_polling())
 
 if __name__ == "__main__":

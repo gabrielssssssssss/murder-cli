@@ -33,11 +33,15 @@ class BotHandler:
             types.InlineKeyboardButton(text="⏩", callback_data=f"pagination_last_{results_uuid}_0")
         )
     
-        for index, result in enumerate(results):
+        for result in results:
             sritct_values = self.utils.get_strict_values(elements=message_splitter)
             if self.utils.check_strict_values(strict_elements=sritct_values, result=result) or len(sritct_values) == 0:
-                self.result_memory_save[str(results_uuid)][index] = result
+                lenght = len(self.result_memory_save[str(results_uuid)])
+                self.result_memory_save[str(results_uuid)][lenght] = result
 
+        new_page = str(self.result_memory_save[str(results_uuid)][0])
+        message = str(new_page).replace("{page_current}", new_page)
+        
         await bot.send_message(
             message.chat.id,
             str(self.result_memory_save[str(results_uuid)][0]),
@@ -57,7 +61,12 @@ class BotHandler:
 
         print("Current page", current_page)
         if data_split[1] == "start":
-            message = memory_save[uuid][current_page]
+            if current_page == 0:
+                await bot.answer_callback_query(call.id, text='🚫 Vous ne pouvez pas effectuer cette action.')
+                return
+            
+            new_page = memory_save[uuid][current_page]
+            message = str(new_page).replace("{page_current}", new_page)
 
             markup.add(
                 types.InlineKeyboardButton(text="◀️", callback_data=f"pagination_previous_{uuid}_0"), 
@@ -75,9 +84,12 @@ class BotHandler:
             )
         
         elif data_split[1] == "previous":
-            await bot.answer_callback_query(callback_query_id="button_click", text="🚫 Vous ne pouvez pas effectuer cette action.")
+            if current_page == 0:
+                await bot.answer_callback_query(call.id, text='🚫 Vous ne pouvez pas effectuer cette action.')
+                return
             
-            message = memory_save[uuid][current_page-1]
+            new_page = memory_save[uuid][current_page-1]
+            message = str(new_page).replace("{page_current}", new_page)
 
             markup.add(
                 types.InlineKeyboardButton(text="◀️", callback_data=f"pagination_previous_{uuid}_{current_page-1}"), 
@@ -95,7 +107,12 @@ class BotHandler:
             )
         
         elif data_split[1] == "next":
-            message = memory_save[uuid][current_page+1]
+            if len(memory_save[uuid]) > current_page+1:
+                await bot.answer_callback_query(call.id, text='🚫 Vous ne pouvez pas effectuer cette action.')
+                return
+            
+            new_page = memory_save[uuid][current_page+1]
+            message = str(new_page).replace("{page_current}", new_page)
 
             markup.add(
                 types.InlineKeyboardButton(text="◀️", callback_data=f"pagination_previous_{uuid}_{current_page+1}"), 
@@ -113,7 +130,12 @@ class BotHandler:
             )
         
         elif data_split[1] == "last":
-            message = memory_save[uuid][current_page+len(memory_save[uuid])-1]
+            if len(memory_save[uuid]) == current_page:
+                await bot.answer_callback_query(call.id, text='🚫 Vous ne pouvez pas effectuer cette action.')
+                return
+
+            new_page = memory_save[uuid][current_page+len(memory_save[uuid])]
+            message = str(new_page).replace("{page_current}", new_page)
 
             markup.add(
                 types.InlineKeyboardButton(text="◀️", callback_data=f"pagination_previous_{uuid}_{len(memory_save[uuid])}"), 
