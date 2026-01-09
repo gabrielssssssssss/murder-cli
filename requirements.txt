@@ -1,3 +1,5 @@
-pyTelegramBotAPI
-pydantic_settings
-python-dotenv
+httpx==0.28.1
+pyTelegramBotAPI==4.29.1
+python-dotenv==1.2.1
+PyYAML==6.0.2
+PyYAML==6.0.3

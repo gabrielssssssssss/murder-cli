@@ -52,7 +52,6 @@ class Utils:
     def get_strict_values(self, elements: list) -> list:
         strict_elements = []
         for element in elements:
-            element = str(element)
             if element.startswith("!") \
                 or re.search(self.regex_birthdate, element) \
                 or re.search(self.regex_phone_number, element) \

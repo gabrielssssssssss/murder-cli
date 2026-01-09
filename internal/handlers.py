@@ -17,8 +17,6 @@ class BotHandler:
 
         parsed_elements = self.utils.parse_elements(message_splitter)
         parsed_filter = self.utils.strict_query_filter(parsed_elements)
-        values_query = dict(parsed_elements.get("plain", ""))
-
         results = self.api_client.search(
             query=message.text,
             filter=parsed_filter,
@@ -32,8 +30,7 @@ class BotHandler:
                 parse_mode="HTML"
             )
 
-        markup = types.InlineKeyboardMarkup(row_width=2)
-        markup.add(
+        markup = types.InlineKeyboardMarkup(row_width=2).add(
             types.InlineKeyboardButton(text="◀️", callback_data=f"pagination_previous_{results_uuid}_0"), 
             types.InlineKeyboardButton(text="▶️", callback_data=f"pagination_next_{results_uuid}_0"), 
             types.InlineKeyboardButton(text="⏪", callback_data=f"pagination_start_{results_uuid}_0"), 
@@ -48,7 +45,10 @@ class BotHandler:
 
         new_page = str(self.result_memory_save[str(results_uuid)][0])
         text = str(new_page).replace("{page_current}", "1")
-        text = text.replace("{total_results}", str(len(self.result_memory_save[str(results_uuid)])))
+        text = text.replace(
+            "{total_results}", 
+            str(len(self.result_memory_save[str(results_uuid)]))
+        )
 
         await bot.send_message(
             message.chat.id,
